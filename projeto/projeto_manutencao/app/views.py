@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import Usuario 
+from .models import Chamado
 from .forms import UsuarioForm, loginForm
 from django.contrib.auth.hashers import make_password, check_password
 
@@ -18,13 +19,16 @@ def login(request):
             
                 print(usuario.nome)
                 print(usuario.senha)
-                return render('usuario', id_usuario=usuario.id)
+                return redirect('usuario', usuario=usuario)
             
             else:
                 print("nao foi")
                 return render(request, 'app/login.html', {'form': form, 'error': 'Usuario ou senha invalidos'})
     else:
         return render(request, 'app/login.html')
+
+# def chamado_listar(request, id_usuario):
+#     return render(request, 'app/chamado_listar.html', {'chamados': chamados})
 
 
 def cadastro(request):
@@ -48,5 +52,7 @@ def listar_usuarios(request):
 
 def usuario(request, id_usuario):
     usuario = Usuario.objects.get(id=id_usuario)
+    chamados = Chamado.objects.all()
 
-    return render(request, 'app/usuario.html', {'usuario': usuario})
+
+    return render(request, 'app/usuario.html', {'usuario': usuario, 'chamados': chamados},)

@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-hi696eh=uq%_q=sev$db=9b-#0&e4va*6=s6+m(27_-^2zj_g=
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
+CSRF_TRUSTED_ORIGINS = ["https://127.0.0.1:8000", "https://localhost:8000"]
 
 # Application definition
 
@@ -40,8 +40,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework.authtoken',
     'app'
 ]
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    ),
+}
 # settings.py
 PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',

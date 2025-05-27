@@ -1,11 +1,320 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SGCT - Sistema de Gestão de Chamados Técnicos</title>
+    <style>
+        /* Reset básico */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f4f8;
+            color: #222;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: #004d99;
+            padding: 1rem 2rem;
+            color: white;
+            font-size: 1.6rem;
+            font-weight: 700;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        main {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        h1 {
+            margin-bottom: 1rem;
+            color: #004d99;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+            line-height: 1.5;
+            font-size: 1.1rem;
+            color: #444;
+        }
+
+        .actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .action-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.07);
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            color: #004d99;
+            font-weight: 600;
+            font-size: 1.15rem;
+            user-select: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 140px;
+        }
+
+        .action-card:hover {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            transform: translateY(-5px);
+            background-color: #e6f0ff;
+        }
+
+        .action-icon {
+            font-size: 2.8rem;
+            margin-bottom: 0.7rem;
+            color: #0073e6;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.9rem;
+            color: #666;
+            border-top: 1px solid #ddd;
+            background: #fafafa;
+        }
+
+        @media (max-width: 600px) {
+            header {
+                font-size: 1.3rem;
+                padding: 1rem;
+            }
+
+            main {
+                padding: 1rem;
+            }
+        }
+
+        .chamados-section {
+            display: hidden;
+            padding: 2rem;
+            background-color: #f9fbfc;
+            margin-top: 20px;
+        }
+
+        .chamado-card {
+            background-color: #fff;
+            border-left: 5px solid #0073e6;
+            border-radius: 6px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            transition: box-shadow 0.2s ease;
+        }
+
+        .chamado-card:hover {
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .chamado-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .chamado-header h3 {
+            color: #004d99;
+            margin: 0;
+            font-size: 1.2rem;
+        }
+
+        .chamado-info {
+            font-size: 0.95rem;
+            color: #555;
+            margin-bottom: 0.8rem;
+            display: flex;
+            gap: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+        .chamado-info span {
+            background: #eef3f8;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+        }
+
+        .chamado-descricao {
+            color: #333;
+            font-size: 1rem;
+            margin-top: 0.6rem;
+        }
+
+        .status {
+            font-weight: bold;
+            color: #0073e6;
+        }
+
+        .prioridade-alta {
+            color: #d32f2f;
+            font-weight: bold;
+        }
+
+        .sem-chamados {
+            color: #888;
+            font-style: italic;
+            margin-top: 1rem;
+        }
+
+        .form-chamado {
+            display: hidden;
+        }
+
+        .formulario-chamado {
+            background-color: #0073e6;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin: 20px;
+            
+        }
+    </style>
+    <!-- Usando ícones simples via emoji, mas pode trocar por FontAwesome ou Material Icons -->
 </head>
+
 <body>
-    {{usuario.nome}}
+    <header>
+        SGCT - Sistema de Gestão de Chamados Técnicos
+    </header>
+
+    <main>
+        <h1>Bem-vindo ao SGCT</h1>
+
+        <section class="summary-card">
+            <p>
+                Sistema web responsivo para registrar, acompanhar e resolver chamados técnicos, promovendo a comunicação
+                eficiente entre clientes, técnicos e administradores. Utilize as opções abaixo para gerenciar seus
+                chamados e interagir com a equipe técnica.
+            </p>
+        </section>
+
+        <section class="actions" aria-label="Principais ações do sistema">
+            <div class="action-card" onclick="abrirChamadoForm()">
+                <div class="action-icon">📝</div>
+                Abrir Novo Chamado
+            </div>
+            <div class="action-card" onclick="acompanharChamados()">
+                <div class="action-icon">📋</div>
+                Acompanhar Chamados
+            </div>
+            <div class="action-card" onclick="location.href='/chat'">
+                <div class="action-icon">💬</div>
+                Chat Interno
+            </div>
+            <div class="action-card" onclick="location.href='/relatorios'">
+                <div class="action-icon">📊</div>
+                Relatórios Gerenciais
+            </div>
+            <div class="action-card" onclick="location.href='/usuarios/perfil'">
+                <div class="action-icon">👤</div>
+                Meu Perfil
+            </div>
+        </section>
+        <section class="form-chamado" >
+            <form method="post">
+                <div class="formulario-chamado">
+
+                    <input type="text" name="titulo" id="titulo">
+                    <input type="text" name="descricao" id="descricao">
+                    <select name="prioridade" id="prioridade">
+                        <option value="Urgente">Pouco urgente</option>
+                        <option value="Urgente">Urgente</option>
+                        <option value="Urgente">Muito Urgente</option>
+                    </select>
+                    <button type="submit">Enviar</button>
+                </div>
+
+            </form>
+        </section>
+
+        <section class="chamados-section">
+            {% for chamado in chamados %}
+            <div class="chamado-card">
+                <div class="chamado-header">
+                    <h3>{{ chamado.titulo }}</h3>
+                    <span class="status">{{ chamado.status }}</span>
+                </div>
+
+                <div class="chamado-info">
+                    <span class="{% if chamado.prioridade == 'Alta' %}prioridade-alta{% endif %}">
+                        Prioridade: {{ chamado.prioridade }}
+                    </span>
+                    <span>Abertura: {{ chamado.data_abertura|date:"d/m/Y" }}</span>
+                    {% if chamado.data_conclusao %}
+                    <span>Conclusão: {{ chamado.data_conclusao|date:"d/m/Y" }}</span>
+                    {% endif %}
+                    {% if chamado.fk_categoria %}
+                    <span>Categoria: {{ chamado.fk_categoria.nome }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="chamado-descricao">
+                    {{ chamado.descricao }}
+                </div>
+            </div>
+            {% empty %}
+            <p class="sem-chamados">Sem chamados no momento.</p>
+            {% endfor %}
+        </section>
+
+    </main>
+    <footer>
+        © 2025 Senai Dendezeiros - Projeto SGCT
+    </footer>
 </body>
+<script>
+    function acompanharChamados() {
+        let section = document.getElementsByClassName('chamados-section')[0]
+        console.log('chamdno')
+        if (!section.classList.contains("hidden")) {
+            section.classList.add("hidden");
+        } else {
+            section.classList.remove("hidden");
+        }
+    }
+    function abrirChamadoForm() {
+        let section = document.getElementsByClassName('form-chamado')[0]
+        if (!section.classList.contains("hidden")) {
+            section.classList.add("hidden");
+        } else {
+            section.classList.remove("hidden");
+        }
+
+    }
+
+
+</script>
+
 </html>
