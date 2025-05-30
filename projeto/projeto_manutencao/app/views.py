@@ -121,12 +121,19 @@ def usuario(request, id):
 
         soma = 0
         for chamado in chamados:
-            if chamado.status == "concluido" and chamado.data_conclusao:
+            if chamado.status.lower() == "concluido" and chamado.data_conclusao and chamado.data_abertura:
                 diferenca = chamado.data_conclusao - chamado.data_abertura
+                print(diferenca)
                 soma += diferenca.total_seconds() / 3600  # converte segundos para horas
-        print(soma)
-        media = soma/(Chamado.objects.all().count())
+
+        quantidade_concluido = Chamado.objects.filter(status__iexact="concluido").count()
+        print(quantidade_concluido)
+        if quantidade_concluido > 0:
+            media = soma / quantidade_concluido
+        else:
+            media = 0
         print(media)
+
 
         return render(
             request,
