@@ -232,7 +232,7 @@ def chat(request, id, id_chamado):
         autorizado = ClienteAbre.objects.filter(
             fk_chamado=chamado, fk_usuario=usuario
         ).exists()
-
+    
     if not autorizado:
         return render(
             request,

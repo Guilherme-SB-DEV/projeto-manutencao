@@ -13,6 +13,49 @@
             box-sizing: border-box;
         }
 
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: #4A90E2;
+            outline: none;
+            box-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
+        }
+
+        button {
+            background-color: #4A90E2;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #357ABD;
+            transform: scale(1.03);
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
         .filtro-status {
             display: flex;
             gap: 1rem;
@@ -401,7 +444,8 @@
     </header>
 
     <main>
-        <h1>Bem-vindo ao SGCT, {{usuario.nome}}, {{usuario.tipo_perfil}}!</h1>
+        <h1>Bem-vindo ao SGCT, {{usuario.nome}}!</h1>
+        <h2>Tipo: {{usuario.tipo_perfil}}</h2>
 
         <section class="summary-card">
             <p>
@@ -429,10 +473,7 @@
                 Relatórios Gerenciais
             </div>
             {%endif%}
-            <div class="action-card" onclick="location.href='/usuarios/perfil'">
-                <div class="action-icon">👤</div>
-                Meu Perfil
-            </div>
+
         </section>
         <section id="container">
             <div class="hidden" id="relatorio">
@@ -460,7 +501,7 @@
                         <h3>Tempo Médio de Resolução</h3>
                         <span>{{ media }} horas</span>
                     </div>
-                   
+
                 </div>
                 <!-- Tabela de desempenho -->
                 <h2 style="margin-top: 50px;">Desempenho por Técnico</h2>
@@ -476,8 +517,8 @@
                         {% for tecnico_obj in tecnicos_obj %}
                         <tr>
                             <td>{{ tecnico_obj.tecnico.nome }}</td>
-                            <td>{{ tecnico_obj.atendimentos }}</td> 
-                            <td>{{ tecnico_obj.tempo }}</td> 
+                            <td>{{ tecnico_obj.atendimentos }}</td>
+                            <td>{{ tecnico_obj.tempo }}</td>
                         </tr>
                         {% empty %}
                         <tr>
@@ -485,7 +526,7 @@
                         </tr>
                         {% endfor %}
 
-                       
+
                     </tbody>
                 </table>
             </div>
@@ -542,9 +583,9 @@
                     <span class="{% if chamado.prioridade == 'Alta' %}prioridade-alta{% endif %}">
                         Prioridade: {{ chamado.prioridade }}
                     </span>
-                    <span>Abertura: {{ chamado.data_abertura|date:"d/m/Y" }}</span>
+                    <span>Abertura: {{ chamado.data_abertura|date:"d/m/Y H:i" }}</span>
                     {% if chamado.data_conclusao %}
-                    <span>Conclusão: {{ chamado.data_conclusao|date:"d/m/Y" }}</span>
+                    <span>Conclusão: {{ chamado.data_conclusao|date:"d/m/Y H:i" }}</span>
                     {% endif %}
                     {% if chamado.tempo_estimado %}
                     <span> Tempo estimado: {{chamado.tempo_estimado}}</span>
@@ -557,10 +598,11 @@
                 <div class="chamado-descricao">
                     {{ chamado.descricao }}
                 </div>
-
+                {%if usuario.tipo_perfil != "admin"%}
                 <div>
                     <a href="{%url 'chat' id=usuario.id  id_chamado=chamado.id%}">chat</a>
                 </div>
+                {%endif%}
 
                 {%if usuario.tipo_perfil == 'tecnico'%}
                 <form action="{% url 'atende' id=usuario.id id_chamado=chamado.id %}" method="post">
@@ -571,7 +613,7 @@
                         <option value="concluido">Concluido</option>
                         <option value="cancelado">cancelado</option>
                     </select>
-                    <input type="number" name="tempo" id="tempo">
+                    <input class="hidden" placeholder="Tempo estimado" min="1" type="number" name="tempo" id="tempo">
                     <button type="submit">Alterar</button>
                 </form>
 
@@ -588,6 +630,18 @@
     </footer>
 </body>
 <script>
+    const status = document.getElementById('status');
+    const tempo = document.getElementById('tempo');
+
+    status.addEventListener("change", () => {
+        if (status.value === "em andamento") {
+            tempo.classList.remove("hidden");
+        } else {
+            tempo.classList.add("hidden");
+        }
+    });
+
+
     function acompanharChamados() {
         let section = document.getElementById('chamados-section')
         console.log('chamdno')
