@@ -8,24 +8,16 @@
 from django.db import models
 
 
-class Categoria(models.Model):
-    id = models.IntegerField(db_column='Id', primary_key=True)  # Field name made lowercase.
-    nome = models.CharField(db_column='Nome', max_length=100, blank=True, null=True)  # Field name made lowercase.
-
-    class Meta:
-        managed = False
-        db_table = 'Categoria'
-
-
 class Chamado(models.Model):
-    id = models.IntegerField(db_column='Id', primary_key=True)  # Field name made lowercase.
-    prioridade = models.CharField(db_column='Prioridade', max_length=100, blank=True, null=True)  # Field name made lowercase.
-    data_conclusao = models.DateField(db_column='Data_Conclusao', blank=True, null=True)  # Field name made lowercase.
-    status = models.CharField(db_column='Status', max_length=100, blank=True, null=True)  # Field name made lowercase.
-    descricao = models.CharField(db_column='Descricao', max_length=100, blank=True, null=True)  # Field name made lowercase.
-    data_abertura = models.DateField(db_column='Data_Abertura', blank=True, null=True)  # Field name made lowercase.
-    titulo = models.CharField(db_column='Titulo', max_length=100, blank=True, null=True)  # Field name made lowercase.
-    fk_categoria = models.ForeignKey(Categoria, models.DO_NOTHING, db_column='fk_Categoria_Id', blank=True, null=True)  # Field name made lowercase.
+    id = models.AutoField(db_column='Id', primary_key=True)  # Field name made lowercase.
+    titulo = models.CharField(db_column='Titulo', max_length=100)  # Field name made lowercase.
+    descricao = models.CharField(db_column='Descricao', max_length=255, blank=True, null=True)  # Field name made lowercase.
+    categoria = models.CharField(db_column='Categoria', max_length=50, blank=True, null=True)  # Field name made lowercase.
+    prioridade = models.CharField(db_column='Prioridade', max_length=20, blank=True, null=True)  # Field name made lowercase.
+    status = models.CharField(db_column='Status', max_length=20, blank=True, null=True)  # Field name made lowercase.
+    data_abertura = models.DateTimeField(db_column='Data_Abertura')  # Field name made lowercase.
+    data_conclusao = models.DateTimeField(db_column='Data_Conclusao', blank=True, null=True)  # Field name made lowercase.
+    tempo_estimado = models.IntegerField(db_column='Tempo_Estimado', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         managed = False
@@ -33,18 +25,21 @@ class Chamado(models.Model):
 
 
 class ClienteAbre(models.Model):
-    fk_usuario = models.ForeignKey('Usuario', models.DO_NOTHING, db_column='fk_Usuario_Id', blank=True, null=True)  # Field name made lowercase.
+    id = models.AutoField(db_column='Id', primary_key=True)  # Field name made lowercase.
+    fk_usuario = models.ForeignKey('Usuario', models.DO_NOTHING, db_column='fk_Usuario_Id')  # Field name made lowercase.
+    fk_chamado = models.ForeignKey(Chamado, models.DO_NOTHING, db_column='fk_Chamado_Id')  # Field name made lowercase.
 
     class Meta:
         managed = False
-        db_table = 'Cliente_abre'
+        db_table = 'Cliente_Abre'
 
 
 class Mensagem(models.Model):
-    id = models.IntegerField(db_column='Id', primary_key=True)  # Field name made lowercase.
-    conteudo = models.CharField(db_column='Conteudo', max_length=100, blank=True, null=True)  # Field name made lowercase.
-    fk_chamado = models.ForeignKey(Chamado, models.DO_NOTHING, db_column='fk_Chamado_Id', blank=True, null=True)  # Field name made lowercase.
-    fk_usuario = models.ForeignKey('Usuario', models.DO_NOTHING, db_column='fk_Usuario_Id', blank=True, null=True)  # Field name made lowercase.
+    id = models.AutoField(db_column='Id', primary_key=True)  # Field name made lowercase.
+    conteudo = models.CharField(db_column='Conteudo', max_length=255)  # Field name made lowercase.
+    fk_chamado = models.ForeignKey(Chamado, models.DO_NOTHING, db_column='fk_Chamado_Id')  # Field name made lowercase.
+    fk_usuario = models.ForeignKey('Usuario', models.DO_NOTHING, db_column='fk_Usuario_Id')  # Field name made lowercase.
+    tempo_envio = models.DateTimeField(db_column='Tempo_envio', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         managed = False
@@ -52,8 +47,8 @@ class Mensagem(models.Model):
 
 
 class Notificacao(models.Model):
-    id = models.IntegerField(db_column='Id', primary_key=True)  # Field name made lowercase.
-    tipo = models.CharField(db_column='Tipo', max_length=100, blank=True, null=True)  # Field name made lowercase.
+    id = models.AutoField(db_column='Id', primary_key=True)  # Field name made lowercase.
+    tipo = models.CharField(db_column='Tipo', max_length=50)  # Field name made lowercase.
     fk_chamado = models.ForeignKey(Chamado, models.DO_NOTHING, db_column='fk_Chamado_Id', blank=True, null=True)  # Field name made lowercase.
     fk_usuario = models.ForeignKey('Usuario', models.DO_NOTHING, db_column='fk_Usuario_Id', blank=True, null=True)  # Field name made lowercase.
 
@@ -62,21 +57,23 @@ class Notificacao(models.Model):
         db_table = 'Notificacao'
 
 
+class TecnicoAtende(models.Model):
+    id = models.AutoField(db_column='Id', primary_key=True)  # Field name made lowercase.
+    fk_usuario = models.ForeignKey('Usuario', models.DO_NOTHING, db_column='fk_Usuario_Id')  # Field name made lowercase.
+    fk_chamado = models.ForeignKey(Chamado, models.DO_NOTHING, db_column='fk_Chamado_Id')  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'Tecnico_Atende'
+
+
 class Usuario(models.Model):
     id = models.AutoField(db_column='Id', primary_key=True)  # Field name made lowercase.
-    senha = models.CharField(db_column='Senha', max_length=100, blank=True, null=True)  # Field name made lowercase.
-    nome = models.CharField(db_column='Nome', max_length=100, blank=True, null=True)  # Field name made lowercase.
-    tipo_perfil = models.CharField(db_column='Tipo_Perfil', max_length=100, blank=True, null=True)  # Field name made lowercase.
-    email = models.CharField(db_column='Email', max_length=100, blank=True, null=True)  # Field name made lowercase.
+    nome = models.CharField(db_column='Nome', max_length=100)  # Field name made lowercase.
+    email = models.CharField(db_column='Email', unique=True, max_length=100)  # Field name made lowercase.
+    senha = models.CharField(db_column='Senha', max_length=100)  # Field name made lowercase.
+    tipo_perfil = models.CharField(db_column='Tipo_Perfil', max_length=50)  # Field name made lowercase.
 
     class Meta:
         managed = False
         db_table = 'Usuario'
-
-
-class TecnicoAtende(models.Model):
-    fk_usuario = models.ForeignKey(Usuario, models.DO_NOTHING, db_column='fk_Usuario_Id', blank=True, null=True)  # Field name made lowercase.
-
-    class Meta:
-        managed = False
-        db_table = 'tecnico_atende'

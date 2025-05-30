@@ -16,13 +16,9 @@ CREATE TABLE Chamado (
     Descricao VARCHAR(100),
     Data_Abertura DATE,
     Titulo VARCHAR(100),
-    fk_Categoria_Id int
+    Categoria VARCHAR(100)    
 );
 
-CREATE TABLE Categoria (
-    Id int PRIMARY KEY,
-    Nome VARCHAR(100)
-);
 
 CREATE TABLE Mensagem (
     Id int PRIMARY KEY,
@@ -50,9 +46,7 @@ ALTER TABLE Usuario ADD CONSTRAINT FK_Usuario_2
     FOREIGN KEY (Id) -- Aqui deve ser a coluna correta de FK
     REFERENCES ??? (???); -- Favor completar com a tabela e coluna corretas
  
-ALTER TABLE Chamado ADD CONSTRAINT FK_Chamado_2
-    FOREIGN KEY (fk_Categoria_Id)
-    REFERENCES Categoria (Id);
+
  
 ALTER TABLE Mensagem ADD CONSTRAINT FK_Mensagem_2
     FOREIGN KEY (fk_Chamado_Id)
