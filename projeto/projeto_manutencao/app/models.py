@@ -73,6 +73,7 @@ class Usuario(models.Model):
     email = models.CharField(db_column='Email', unique=True, max_length=100)  # Field name made lowercase.
     senha = models.CharField(db_column='Senha', max_length=100)  # Field name made lowercase.
     tipo_perfil = models.CharField(db_column='Tipo_Perfil', max_length=50)  # Field name made lowercase.
+    auth = models.CharField(db_column='Auth', max_length=100, blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         managed = False

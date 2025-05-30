@@ -7,6 +7,7 @@ CREATE TABLE Usuario (
     Email VARCHAR(100) NOT NULL UNIQUE,
     Senha VARCHAR(100) NOT NULL,
     Tipo_Perfil VARCHAR(50) NOT NULL,
+    Auth VARCHAR(100),
     CONSTRAINT chk_tipo_perfil CHECK (Tipo_Perfil IN ('cliente', 'tecnico', 'admin'))
 );
 

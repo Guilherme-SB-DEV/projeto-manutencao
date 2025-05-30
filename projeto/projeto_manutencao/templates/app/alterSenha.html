@@ -38,7 +38,7 @@
   <div class="container d-flex justify-content-center align-items-center min-vh-100">
     <div class="col-md-6 form-container">
       <h2 class="text-center">Alterar senha</h2>
-      <form action="{%url 'alterSenha'%}" method="post">
+      <form  method="post">
         {% csrf_token %}
         <input type="password" name="senha" class="form-control mb-3" placeholder="Senha" required>
 

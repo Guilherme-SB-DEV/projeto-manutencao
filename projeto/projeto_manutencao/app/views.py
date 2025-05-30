@@ -13,10 +13,11 @@ from .forms import UsuarioForm, loginForm
 from django.contrib.auth.hashers import make_password, check_password
 from datetime import datetime
 import random
+from django.urls import reverse
 
 import yagmail
 
-yag = yagmail.SMTP("guilhermebra93@gmail.com", "sriz ybmm okxy kyme")
+yag = yagmail.SMTP("guilhermebra93@gmail.com", "vnux azxn svww gvnf")
 codigo = ""
 
 def index(request):
@@ -141,7 +142,6 @@ def usuario(request, id):
                 "clientes": usuarios.filter(tipo_perfil="cliente"),
                 "tecnicos_obj": tecnicos_obj,
                 "chamados": chamados,
-                "atendimentos": atendimentos,
                 "abertos": quantidade_aberto,
                 "em_andamento": quantidade_em_andamento,
                 "concluidos": quantidade_concluido,
@@ -269,10 +269,13 @@ def recuperacao(request):
             usuario = Usuario.objects.get(email=email)
             
             token = random.randint(100000, 999999)  # Exemplo: 6 dígitos
+            print(token)
 
-            codigo = token
+            usuario.auth = token
+            usuario.save()
 
-            link = request.build_absolute_uri(f"/alterSenha/{token}/{usuario.id}")
+            url_path = reverse('alterSenha', kwargs={'token': token, 'id': usuario.id})
+            link = request.build_absolute_uri(url_path)
             yag.send(
                 to=usuario.email,
                 subject="Recuperação de senha",
@@ -288,11 +291,16 @@ def recuperacao(request):
 def alterSenha(request, token, id):
     if request.method == "POST":
         senha_nova = request.POST.get("senha")
-        if(codigo ==token):
+        print(senha_nova)
+        usuario = Usuario.objects.get(id=id)
+        print(usuario.nome)
+        print(usuario.nome)
+        if(str(usuario.auth) == str(token)):
+            print('é igual')
             usuario = Usuario.objects.get(id=id)
-            usuario.senha = senha_nova
+            usuario.senha = make_password(senha_nova)
             usuario.save()
-        return redirect("login", mensagem="Sua senha foi alterada com sucesso")
+        return redirect("login")
     elif request.method == "GET":
         return render(request, "app/alterSenha.html")
         

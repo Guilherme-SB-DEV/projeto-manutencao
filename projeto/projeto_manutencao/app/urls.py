@@ -10,6 +10,6 @@ urlpatterns = [
     path('recuperacao/', views.recuperacao, name='recuperacao'),
     path('atende/<int:id>/<int:id_chamado>', views.atende, name='atende'),
     path('chat/<int:id>/<int:id_chamado>', views.chat, name='chat'),
-    path('alterSenha/<int:token>/<int:id>', views.alterSenha, name='alterSenha')
+    path('alterSenha/<int:token>/auth/<int:id>', views.alterSenha, name='alterSenha')
     # path('usuario/<int:id_usuario>/chamado/listar', views.chamado_listar, name='chamado_listar')
 ]
