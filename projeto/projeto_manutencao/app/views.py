@@ -12,6 +12,8 @@ from django.utils.crypto import get_random_string
 from .forms import UsuarioForm, loginForm
 from django.contrib.auth.hashers import make_password, check_password
 from datetime import datetime
+import random
+
 import yagmail
 
 yag = yagmail.SMTP("guilhermebra93@gmail.com", "sriz ybmm okxy kyme")
@@ -265,17 +267,19 @@ def recuperacao(request):
         email = request.POST.get("email")
         try:
             usuario = Usuario.objects.get(email=email)
-            token = get_random_string(64)
+            
+            token = random.randint(100000, 999999)  # Exemplo: 6 dígitos
+
             codigo = token
 
-            link = request.build_absolute_uri(f"/alterar-senha/{token}/{usuario.id}")
+            link = request.build_absolute_uri(f"/alterSenha/{token}/{usuario.id}")
             yag.send(
                 to=usuario.email,
                 subject="Recuperação de senha",
                 contents=f"Clique no link para alterar sua senha: {link}",
             )
 
-            return redirect("alterSenha")
+            return redirect("login")
         except Usuario.DoesNotExist:
             return render(request, "app/recuperacao.html", {"erro": "E-mail não encontrado"})
 
@@ -289,6 +293,6 @@ def alterSenha(request, token, id):
             usuario.senha = senha_nova
             usuario.save()
         return redirect("login", mensagem="Sua senha foi alterada com sucesso")
-    else:
+    elif request.method == "GET":
         return render(request, "app/alterSenha.html")
         
