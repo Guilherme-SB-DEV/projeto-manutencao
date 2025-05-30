@@ -1,3 +1,4 @@
+from django.db.models import Q  
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import Usuario
@@ -7,14 +8,14 @@ from .models import TecnicoAtende
 from .models import Mensagem
 from django.utils import timezone
 from django.shortcuts import render, get_object_or_404
-
+from django.utils.crypto import get_random_string
 from .forms import UsuarioForm, loginForm
 from django.contrib.auth.hashers import make_password, check_password
 from datetime import datetime
 import yagmail
 
 yag = yagmail.SMTP("guilhermebra93@gmail.com", "sriz ybmm okxy kyme")
-
+codigo = ""
 
 def index(request):
     return HttpResponse("Hello, world. You're at the polls index.")
@@ -42,8 +43,6 @@ def login(request):
         return render(request, "app/login.html")
 
 
-# def chamado_listar(request, id_usuario):
-#     return render(request, 'app/chamado_listar.html', {'chamados': chamados})
 
 
 def cadastro(request):
@@ -61,12 +60,9 @@ def cadastro(request):
         return render(request, "app/cadastro.html")
 
 
-def listar_usuarios(request):
-    usuarios = Usuario.objects.all()
-    return render(request, "app/listar_usuarios.html", {"usuarios": usuarios})
 
 
-from django.db.models import Q  # Import necessário
+
 
 
 def usuario(request, id):
@@ -267,14 +263,32 @@ def chat(request, id, id_chamado):
 def recuperacao(request):
     if request.method == "POST":
         email = request.POST.get("email")
-        usuario = Usuario.objects.get(email=email)
-        if usuario:
+        try:
+            usuario = Usuario.objects.get(email=email)
+            token = get_random_string(64)
+            codigo = token
+
+            link = request.build_absolute_uri(f"/alterar-senha/{token}/{usuario.id}")
             yag.send(
                 to=usuario.email,
-                subject="Recuperacao de Senha",
-                contents="Sua senha é: " + usuario.senha,
+                subject="Recuperação de senha",
+                contents=f"Clique no link para alterar sua senha: {link}",
             )
 
-        return redirect("login", mensagem="Sua senha foi enviada pelo seu email.")
+            return redirect("alterSenha")
+        except Usuario.DoesNotExist:
+            return render(request, "app/recuperacao.html", {"erro": "E-mail não encontrado"})
+
+    return render(request, "app/recuperacao.html")
+
+def alterSenha(request, token, id):
+    if request.method == "POST":
+        senha_nova = request.POST.get("senha")
+        if(codigo ==token):
+            usuario = Usuario.objects.get(id=id)
+            usuario.senha = senha_nova
+            usuario.save()
+        return redirect("login", mensagem="Sua senha foi alterada com sucesso")
     else:
-        return render(request, "app/recuperacao.html")
+        return render(request, "app/alterSenha.html")
+        
